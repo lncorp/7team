@@ -1,5 +1,4 @@
 import streamlit as st
-from datetime import datetime
 
 st.title("관광 및 숙박 특화 AI 챗봇")
 
