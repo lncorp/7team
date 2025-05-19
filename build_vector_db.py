@@ -13,4 +13,4 @@ embedding_model = HuggingFaceEmbeddings(model_name="jhgan/ko-sbert-sts")
 
 # 3. 벡터 DB 생성 및 저장
 db = FAISS.from_documents(docs, embedding_model)
-db.save_local("faiss_gangwon_db")
+db.save_local("db")
