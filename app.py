@@ -1,55 +1,42 @@
 import streamlit as st
-from langchain.chains import RetrievalQA
-from langchain.vectorstores import FAISS
+from transformers import pipeline
+from langchain.vectorstores import Chroma
 from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.llms import HuggingFacePipeline
-from langchain.prompts import PromptTemplate
-from transformers import GPT2LMHeadModel, PreTrainedTokenizerFast, pipeline
 
-# LLM 설정
-tokenizer = PreTrainedTokenizerFast.from_pretrained("skt/kogpt2-base-v2")
-model = GPT2LMHeadModel.from_pretrained("skt/kogpt2-base-v2")
-#pipe = pipeline("text-generation", model=model, tokenizer=tokenizer, max_length=100)
-pipe = pipeline(
-    "text-generation",
-    model=model,
-    tokenizer=tokenizer,
-    max_new_tokens=500,
-    do_sample=True,
-    temperature=0.7
-)
-llm = HuggingFacePipeline(pipeline=pipe)
+# Streamlit 설정
+st.set_page_config(page_title="강원도 관광 및 숙박 특화 AI 챗봇", page_icon="🌄")
+st.title("🌄 강원도 관광 및 숙박 특화 AI 챗봇")
+st.markdown("질문 예시: `속초 명소 추천해줘`, `춘천에서 뭘 먹어야 해?`, `강릉 어디가 좋아?`")
 
-custom_prompt = PromptTemplate(
-    input_variables=["context", "question"],
-    template="""
-    [아래는 강원도 관광 정보입니다. 이 문맥을 바탕으로 질문에 답하세요.]
-    문맥:
-    {context}
+# 사용자 질문 입력
+question = st.text_input("✍️ 궁금한 점을 입력하세요:")
 
-    질문:
-    {question}
-
-    답변:
-    """
+# QA 파이프라인 생성
+qa_pipeline = pipeline(
+    task='question-answering',
+    model='beomi/KcELECTRA-base',
+    tokenizer='beomi/KcELECTRA-base'
 )
 
+# Chroma DB 로딩
+embedding_model = HuggingFaceEmbeddings(model_name="jhgan/ko-sbert-sts")
+db = Chroma(persist_directory="db", embedding_function=embedding_model)
 
-# 벡터 DB 불러오기
-embeddings = HuggingFaceEmbeddings(model_name="jhgan/ko-sbert-sts")
-db = FAISS.load_local("db", embeddings, allow_dangerous_deserialization=True)
-#qa = RetrievalQA.from_chain_type(llm=llm, retriever=db.as_retriever())
-qa = RetrievalQA.from_chain_type(
-    llm=llm,
-    retriever=db.as_retriever(),
-    chain_type="stuff",
-    chain_type_kwargs={"prompt": custom_prompt}
-)
+# 질문 처리
+if question:
+    with st.spinner("🔍 관련 문맥 검색 중..."):
+        docs = db.similarity_search(question, k=1)
 
-# Streamlit UI
-st.title("🏔️강원도 관광 및 숙박 특화 AI 챗봇")
-query = st.text_input("무엇이 궁금하신가요?")
+    if not docs:
+        st.error("😥 관련 정보를 찾지 못했어요. 질문을 다시 입력해 주세요.")
+    else:
+        context = docs[0].page_content.strip()
+        if not context:
+            st.warning("문맥이 비어 있어 기본 설명으로 대체합니다.")
+            context = "강원도는 자연, 바다, 산이 어우러진 대표 관광지입니다."
 
-if query:
-    answer = qa.run(query)
-    st.markdown(f"**🤖 챗봇:** {answer}")
+        with st.spinner("🤖 답변 생성 중..."):
+            result = qa_pipeline(question=question, context=context, top_k=3)
+            answers = [r["answer"] for r in result]
+            st.markdown("### 🤖 챗봇의 답변")
+            st.success(" · ".join(answers))

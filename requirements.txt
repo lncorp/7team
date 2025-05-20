@@ -1,6 +1,6 @@
-langchain
-faiss-cpu
-sentence-transformers
 streamlit
 transformers
 torch
+sentence-transformers
+langchain
+chromadb
