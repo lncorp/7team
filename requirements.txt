@@ -5,3 +5,4 @@ chromadb
 transformers
 torch
 sentence-transformers
+protobuf==3.20.3
