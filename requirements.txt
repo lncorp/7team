@@ -5,3 +5,5 @@ chromadb
 transformers
 torch
 sentence-transformers
+langchain
+chromadb
