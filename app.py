@@ -53,8 +53,8 @@ if question:
                 # 출력
                 st.markdown("### 🤖 챗봇의 답변")
                 st.success(answer)
-                st.markdown("#### 🔎 참고 문맥")
-                st.info(context)
+                #st.markdown("#### 🔎 참고 문맥")
+                #st.info(context)
 
                 # 히스토리 저장
                 st.session_state.qa_history.append((question, answer))
