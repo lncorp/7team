@@ -12,7 +12,7 @@ st.markdown("질문 예시: `속초 명소 추천해줘`, `춘천에서 뭘 먹�
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
-# QA 파이프라인 생성
+# KcELECTRA(케이씨 일렉트라) 모델 로딩
 #@st.cache_resource
 #def load_qa_pipeline():
 #    return pipeline(
@@ -24,7 +24,7 @@ if "chat_history" not in st.session_state:
 
 #qa = load_qa_pipeline()
 
-# KoAlpaca 모델 로딩
+# KoAlpaca(코알파카) 모델 로딩
 @st.cache_resource
 def load_model():
     tokenizer = AutoTokenizer.from_pretrained("beomi/KoAlpaca-Polyglot-5.8B")
