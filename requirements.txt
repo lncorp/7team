@@ -4,4 +4,4 @@ torch
 sentencepiece
 langchain
 chromadb
-protobufdir
+protobuf
