@@ -1,7 +1,7 @@
 streamlit
 transformers
 torch
-sentence-transformers
-langchain==0.0.320
-chromadb==0.4.15
-protobuf==3.20.3
+sentencepiece
+langchain
+chromadb
+protobuf
