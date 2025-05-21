@@ -1,5 +1,5 @@
 import streamlit as st
-from transformers import pipeline
+from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from langchain.vectorstores import Chroma
 from langchain.embeddings import HuggingFaceEmbeddings
 
@@ -13,16 +13,24 @@ if "qa_history" not in st.session_state:
     st.session_state.qa_history = []
 
 # QA 파이프라인 생성
-@st.cache_resource
-def load_qa_pipeline():
-    return pipeline(
-        task="question-answering",
-        model="beomi/KcELECTRA-base",
-        tokenizer="beomi/KcELECTRA-base",
-        device=-1  # CPU 전용 실행
-    )
+#@st.cache_resource
+#def load_qa_pipeline():
+#    return pipeline(
+#        task="question-answering",
+#        model="beomi/KcELECTRA-base",
+#        tokenizer="beomi/KcELECTRA-base",
+#        device=-1  # CPU 전용 실행
+#    )
 
-qa = load_qa_pipeline()
+#qa = load_qa_pipeline()
+
+@st.cache_resource
+def load_model():
+    tokenizer = AutoTokenizer.from_pretrained("beomi/KoAlpaca-Polyglot-5.8B")
+    model = AutoModelForCausalLM.from_pretrained("beomi/KoAlpaca-Polyglot-5.8B")
+    return pipeline("text-generation", model=model, tokenizer=tokenizer)
+
+qa = load_model()
 
 # Chroma 벡터 DB 로딩
 @st.cache_resource
@@ -33,7 +41,9 @@ def load_chroma():
 db = load_chroma()
 
 # 사용자 질문 입력
-question = st.text_input("✍️ 궁금한 점을 입력하세요:")
+#question = st.text_input("✍️ 궁금한 점을 입력하세요:")
+question = st.chat_input("✍️ 궁금한 점을 입력하세요:")
+
 
 
 # 질문 처리
@@ -47,14 +57,27 @@ if question:
         context = docs[0].page_content.strip()
         with st.spinner("🤖 답변 생성 중입니다..."):
             try:
-                result = qa(question=question, context=context)
-                answer = result["answer"]
+                #result = qa(inputs=question, max_new_tokens=300)
+                #output = qa(input_text, max_new_tokens=300)
+                #answer = result["answer"]
+                #answer = output[0]["generated_text"].strip()
+
+                prompt = f"### 질문: {question}\n### 문맥: {context}\n### 답변:"
+
+                output = qa(prompt, max_new_tokens=200, do_sample=True, temperature=0.7)
+                answer = output[0]["generated_text"].split("### 답변:")[-1].strip()
+
+                messages = st.container(height=100)
+                messages2 = st.container(height=400)
 
                 # 출력
-                st.markdown("### 🤖 챗봇의 답변")
-                st.success(answer)
+                #st.markdown("### 🤖 챗봇의 답변")
+                #st.success(answer)
                 #st.markdown("#### 🔎 참고 문맥")
                 #st.info(context)
+
+                messages.chat_message("user").write(question)
+                messages2.chat_message("assistant").write(f"챗봇의 답변: {answer}")
 
                 # 히스토리 저장
                 st.session_state.qa_history.append((question, answer))

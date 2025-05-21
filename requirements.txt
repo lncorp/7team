@@ -1,6 +1,7 @@
 streamlit
 transformers
 torch
-sentence-transformers
+sentencepiece
 langchain
 chromadb
+protobufdir
