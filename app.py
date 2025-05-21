@@ -9,8 +9,8 @@ st.title("🌄 강원도 관광 및 숙박 특화 AI 챗봇")
 st.markdown("질문 예시: `속초 명소 추천해줘`, `춘천에서 뭘 먹어야 해?`, `강릉 어디가 좋아?`")
 
 # 세션 상태 초기화
-if "qa_history" not in st.session_state:
-    st.session_state.qa_history = []
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
 
 # QA 파이프라인 생성
 #@st.cache_resource
@@ -24,6 +24,7 @@ if "qa_history" not in st.session_state:
 
 #qa = load_qa_pipeline()
 
+# KoAlpaca 모델 로딩
 @st.cache_resource
 def load_model():
     tokenizer = AutoTokenizer.from_pretrained("beomi/KoAlpaca-Polyglot-5.8B")
@@ -41,9 +42,7 @@ def load_chroma():
 db = load_chroma()
 
 # 사용자 질문 입력
-#question = st.text_input("✍️ 궁금한 점을 입력하세요:")
 question = st.chat_input("✍️ 궁금한 점을 입력하세요:")
-
 
 
 # 질문 처리
@@ -52,56 +51,36 @@ if question:
         docs = db.similarity_search(question, k=1)
 
     if not docs:
-        st.error("❌ 관련 정보를 찾지 못했습니다. 질문을 더 구체적으로 입력해 주세요.")
+        st.chat_message("assistant").write("❌ 관련 정보를 찾지 못했습니다. 질문을 더 구체적으로 입력해 주세요.")
     else:
         context = docs[0].page_content.strip()
         with st.spinner("🤖 답변 생성 중입니다..."):
             try:
-                #result = qa(inputs=question, max_new_tokens=300)
-                #output = qa(input_text, max_new_tokens=300)
-                #answer = result["answer"]
-                #answer = output[0]["generated_text"].strip()
-
                 prompt = f"### 질문: {question}\n### 문맥: {context}\n### 답변:"
-
-                output = qa(prompt, max_new_tokens=200, do_sample=True, temperature=0.7)
+                output = qa(prompt, max_new_tokens=300, do_sample=True, temperature=0.7)
                 answer = output[0]["generated_text"].split("### 답변:")[-1].strip()
 
-                messages = st.container(height=100)
-                messages2 = st.container(height=400)
-
-                # 출력
-                #st.markdown("### 🤖 챗봇의 답변")
-                #st.success(answer)
-                #st.markdown("#### 🔎 참고 문맥")
-                #st.info(context)
-
-                messages.chat_message("user").write(question)
-                messages2.chat_message("assistant").write(f"챗봇의 답변: {answer}")
+                st.chat_message("user").write(question)
+                st.chat_message("assistant").write(answer)
 
                 # 히스토리 저장
-                st.session_state.qa_history.append((question, answer))
+                st.session_state.chat_history.append(("질문", question))
+                st.session_state.chat_history.append(("답변", answer))
 
             except Exception as e:
-                st.error(f"⚠️ 오류 발생: {e}")
+                st.chat_message("assistant").write(f"⚠️ 오류 발생: {e}")
 
 # 이전 대화 기록 보기 / 다운로드 / 초기화
-if st.session_state.qa_history:
+if st.session_state.chat_history:
     with st.expander("🗃️ 이전 질문과 답변 보기 / 저장 / 초기화"):
-        for i, (q, a) in enumerate(reversed(st.session_state.qa_history), 1):
-            st.markdown(f"**Q{i}:** {q}")
-            st.markdown(f"**A{i}:** {a}")
-            st.markdown("---")
-
-        # 다운로드 버튼
+        for role, msg in st.session_state.chat_history:
+            st.markdown(f"**{role.upper()}**: {msg}")
         st.download_button(
             label="📥 전체 대화 저장 (txt)",
-            data="\n\n".join([f"Q: {q}\nA: {a}" for q, a in st.session_state.qa_history]),
-            file_name="qa_history.txt",
+            data="\n\n".join([f"{role.upper()}: {msg}" for role, msg in st.session_state.chat_history]),
+            file_name="chat_history.txt",
             mime="text/plain"
         )
-
-        # 초기화 버튼
         if st.button("🧹 대화 기록 초기화"):
-            st.session_state.qa_history.clear()
+            st.session_state.chat_history.clear()
             st.success("✅ 기록이 초기화되었습니다.")
