@@ -29,7 +29,10 @@ if "chat_history" not in st.session_state:
 def load_model():
     tokenizer = AutoTokenizer.from_pretrained("beomi/KoAlpaca-Polyglot-5.8B")
     model = AutoModelForCausalLM.from_pretrained("beomi/KoAlpaca-Polyglot-5.8B")
-    return pipeline("text-generation", model=model, tokenizer=tokenizer)
+    #return pipeline("text-generation", model=model, tokenizer=tokenizer)
+
+    #최적화 모드
+    return pipeline("text-generation", model=model, tokenizer=tokenizer, device=-1)
 
 qa = load_model()
 
@@ -57,7 +60,10 @@ if question:
         with st.spinner("🤖 답변 생성 중입니다..."):
             try:
                 prompt = f"### 질문: {question}\n### 문맥: {context}\n### 답변:"
-                output = qa(prompt, max_new_tokens=300, do_sample=True, temperature=0.7)
+                #output = qa(prompt, max_new_tokens=300, do_sample=True, temperature=0.7)
+
+                #최적화 모드
+                output = qa(prompt, max_new_tokens=120, do_sample=False, temperature=0.3)
                 answer = output[0]["generated_text"].split("### 답변:")[-1].strip()
 
                 st.chat_message("user").write(question)
