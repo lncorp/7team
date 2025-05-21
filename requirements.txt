@@ -1,8 +1,6 @@
 streamlit
-langchain==0.0.320
-langchain-community
-chromadb==0.4.15
 transformers
 torch
 sentence-transformers
-protobuf==3.20.3
+langchain
+chromadb

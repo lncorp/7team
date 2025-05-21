@@ -15,8 +15,7 @@ question = st.text_input("✍️ 궁금한 점을 입력하세요:")
 qa_pipeline = pipeline(
     task='question-answering',
     model='beomi/KcELECTRA-base',
-    tokenizer='beomi/KcELECTRA-base',
-    device=-1  # CPU에서 강제로 실행
+    tokenizer='beomi/KcELECTRA-base'
 )
 
 # Chroma DB 로딩
