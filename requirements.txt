@@ -1,7 +1,7 @@
 streamlit
 transformers
 torch
-sentencepiece
+sentence-transformers
 langchain
 chromadb
 protobuf
