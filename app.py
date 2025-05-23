@@ -63,7 +63,7 @@ if question:
                 #output = qa(prompt, max_new_tokens=300, do_sample=True, temperature=0.7)
 
                 #최적화 모드
-                output = qa(prompt, max_new_tokens=120, do_sample=False, temperature=0.3)
+                output = qa(prompt, max_new_tokens=300, do_sample=False, temperature=0.3)
                 answer = output[0]["generated_text"].split("### 답변:")[-1].strip()
 
                 st.chat_message("user").write(question)
