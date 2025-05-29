@@ -1,7 +1,8 @@
 streamlit
-transformers
-torch
-sentence-transformers
+openai
 langchain
 chromadb
-protobuf
+transformers
+sentence-transformers
+pandas
+openpyxl
