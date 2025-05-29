@@ -9,3 +9,8 @@ pandas
 openpyxl
 python-dotenv
 urllib3<2  # OpenSSL 호환 이슈 방지
+
+# CPU-only PyTorch 설치
+torch==2.1.0+cpu
+torchvision==0.16.0+cpu
+--find-links https://download.pytorch.org/whl/torch_stable.html
