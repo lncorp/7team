@@ -6,3 +6,4 @@ transformers
 sentence-transformers
 pandas
 openpyxl
+python-dotenv

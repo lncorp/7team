@@ -1,10 +1,15 @@
 import streamlit as st
 import os
 from openai import OpenAI
+from dotenv import load_dotenv
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"] if "OPENAI_API_KEY" in st.secrets else os.getenv("OPENAI_API_KEY"))
+load_dotenv()  # .env 파일에서 환경 변수 로드
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+#client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"] if "OPENAI_API_KEY" in st.secrets else os.getenv("OPENAI_API_KEY"))
 
 st.set_page_config(page_title="강원도 관광 및 숙박 특화 AI 챗봇", page_icon="🌄")
 st.title("🌄 강원도 관광 및 숙박 특화 AI 챗봇")
