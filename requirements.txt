@@ -2,6 +2,7 @@ streamlit
 openai
 langchain>=0.2.0
 langchain-community
+chromadb
 transformers
 sentence-transformers
 pandas
@@ -11,5 +12,4 @@ urllib3<2
 
 # CPU 전용 PyTorch 안전 설치
 torch==2.1.0
-torchvision==0.16.0new file:   packages.txt
-#	modified:   requirements.txt
+torchvision==0.16.0
