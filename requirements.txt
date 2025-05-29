@@ -1,9 +1,11 @@
 streamlit
 openai
-langchain
+langchain>=0.2.0
+langchain-community
 chromadb
 transformers
 sentence-transformers
 pandas
 openpyxl
 python-dotenv
+urllib3<2  # OpenSSL 호환 이슈 방지
