@@ -1,7 +1,0 @@
-build-essential
-python3-dev
-libffi-dev
-cmake
-rustc
-curl
-libssl-dev
