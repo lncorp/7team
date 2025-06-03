@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+.env           # ✅ OpenAI API Key 등 민감 정보 숨기기
+*.sqlite3      # ✅ Chroma DB 파일 무시
+db/            # ✅ DB 전체 폴더 무시 (세션별 DB까지 포함되면)
+
+# Jupyter / VSCode 등 IDE
+.ipynb_checkpoints/
+.vscode/
+.DS_Store
+
+# Streamlit 캐시 (선택)
+.streamlit/
+
+# OS / 기타
+*.log
+*.tmp
